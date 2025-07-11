@@ -1,0 +1,43 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceGroupName": {
+            "value": "contoso-rg-aue-0"
+        },
+        "location": {
+            "value": "australiaeast"
+        },
+        "nsgName":{
+            "value": "contoso-nsg-aue-0"
+        },
+        "virtualnetworkName":{
+            "value": "contoso-vnet-aue-0"
+        },
+        "virtualNetworkaddressSpace":{
+            "value": "192.168.1.0/24"
+        },
+        "dnsServers":{
+            "value": "10.10.10.10"
+        },
+        "subnet01Name":{
+            "value": "snet-aue-0"
+        },
+        "Subnet01CIDR":{
+            "value": "192.168.1.0/26"
+        },
+        "optionalInfor":{
+            "value": {
+                "tagsdetail": {
+                    "plaform":"moreen",
+                    "workload":"Development",
+                    "architect":"Sandman",
+                    "owner":"IT",
+                    "support":"24x7"
+                }
+            }
+        }
+   
+    }
+}
+ 
