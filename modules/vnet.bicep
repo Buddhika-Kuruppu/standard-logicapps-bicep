@@ -1,0 +1,52 @@
+targetScope = 'resourceGroup'
+
+@description('Define Virtual network Name')
+param virtualnetworkName string
+
+@description('Define Location of resources going to deploy')
+param location string
+
+@description('Define IP Address Spaces')
+param virtualNetworkaddressSpace string
+param dnsServers string
+param subnet01Name string
+param Subnet01CIDR string
+
+@description('Define the Tags')
+param optionalInfo object
+
+@description('Define the Network Security Group Id from NSG module')
+param networkSecurityGroupId string
+
+resource VNET 'Microsoft.Network/virtualNetworks@2024-07-01' = {
+  name:virtualnetworkName
+  location:location
+  tags:{
+    Platform:optionalInfo.tagsdetail.platform
+    Workload:optionalInfo.tagsdetail.workload
+    Architect:optionalInfo.tagsdetail.architect
+    Owner:optionalInfo.tagsdetail.owner
+    Support:optionalInfo.tagsdetail.support
+  }
+  properties:{
+    addressSpace:{
+      addressPrefixes:[virtualNetworkaddressSpace]   
+    }
+    dhcpOptions:{
+      dnsServers:[dnsServers]
+    }
+  }
+}
+
+resource subnet01 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' = {
+  name:subnet01Name
+  parent:VNET
+  properties:{
+    addressPrefix:Subnet01CIDR
+    privateEndpointNetworkPolicies:'Enabled'
+    privateLinkServiceNetworkPolicies:'Enabled'
+    networkSecurityGroup:{
+      id:networkSecurityGroupId
+    }
+  }
+}
