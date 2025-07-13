@@ -1,7 +1,8 @@
 targetScope = 'subscription'
 param resourceGroupName string
 param location string
-param nsgName string
+param nsgpeName string
+param nsgaseName string
 
 @description('Define Virtual network Name')
 param virtualnetworkName string
@@ -11,9 +12,14 @@ param virtualNetworkaddressSpace string
 param dnsServers string
 param subnet01Name string
 param Subnet01CIDR string
+param subnet02Name string
+param Subnet02CIDR string
 
 @description('Define the Tags')
 param optionalInfo object
+
+@description('define the ASE Parameters')
+param aseName string
 
 module RG '../../modules/rg.bicep' = {
   name:'deploy-resourceGroup'
@@ -28,7 +34,8 @@ module NSG '../../modules/nsg.bicep' = {
   name:'deploy-NSG'
   scope:resourceGroup(resourceGroupName)
   params: {
-    nsgName:nsgName
+    nsgpeName:nsgpeName
+    nsgaseName:nsgaseName
     location:location
     optionalInfo:optionalInfo
   }
@@ -45,8 +52,22 @@ module VNET '../../modules/vnet.bicep' = {
     dnsServers:dnsServers
     subnet01Name:subnet01Name
     Subnet01CIDR:Subnet01CIDR
-    networkSecurityGroupId:NSG.outputs.nsgId
+    subnet02Name:subnet02Name
+    Subnet02CIDR:Subnet02CIDR
+    PEnetworkSecurityGroupId:NSG.outputs.nsgpeId
+    ASEnetworkSecurityGroupId:NSG.outputs.nsgaseId
     optionalInfo:optionalInfo
   }
   dependsOn:[RG]
+}
+
+//Here App Service Environment is deployed through Azure Verified Modules Registry
+module ASE 'br/public:avm/res/web/hosting-environment:0.4.0' = {
+  name: 'hostingEnvironmentDeployment'
+  scope:resourceGroup(resourceGroupName)
+  params: {
+    // Required parameters for basic deployment
+    name: aseName
+    subnetResourceId: VNET.outputs.aseSubnetId
+  }
 }
