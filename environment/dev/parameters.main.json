@@ -32,6 +32,15 @@
         "Subnet02CIDR":{
             "value": "192.168.1.64/26"
         },
+        "aspName": {
+            "value": "asp-development-001"
+        },
+        "aspSKU": {
+            "value": "I1v2"
+        },
+        "aspCapacity": {
+            "value": 2
+        },
         "optionalInfor":{
             "value": {
                 "tagsdetail": {
