@@ -21,6 +21,11 @@ param optionalInfo object
 @description('define the ASE Parameters')
 param aseName string
 
+@description('Define ASP Parameter Values')
+param aspName string
+param aspSKU string
+param aspCapacity int
+
 module RG '../../modules/rg.bicep' = {
   name:'deploy-resourceGroup'
   params:{
@@ -69,5 +74,18 @@ module ASE 'br/public:avm/res/web/hosting-environment:0.4.0' = {
     // Required parameters for basic deployment
     name: aseName
     subnetResourceId: VNET.outputs.aseSubnetId
+  }
+}
+
+module ASP '../../modules/asp.bicep' = {
+  name:'AppS-ervice-Plan-Deployment'
+  scope:resourceGroup(resourceGroupName)
+  params:{
+    aspName:aspName
+    location:location
+    optionalInfo:optionalInfo
+    aseId:ASE.outputs.resourceId
+    aspSKU:aspSKU
+    aspCapacity:aspCapacity
   }
 }
