@@ -33,7 +33,7 @@
             "value": "192.168.1.64/26"
         },
         "aspName": {
-            "value": "asp-production-001"
+            "value": "asp-development-001"
         },
         "aspSKU": {
             "value": "I1v2"
