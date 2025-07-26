@@ -18,23 +18,23 @@ param aspCapacity int
 @description('Optional information including tags details')
 param optionalInfo object
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2024-11-01' = {
-  name:aspName
-  location:location
-  tags:{
-    Platform:optionalInfo.tagsdetail.platform
-    Workload:optionalInfo.tagsdetail.workload
-    Architect:optionalInfo.tagsdetail.architect
-    Owner:optionalInfo.tagsdetail.owner
-    Support:optionalInfo.tagsdetail.support
+resource appServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = {
+  name: aspName
+  location: location
+  tags: {
+    Platform: optionalInfo.tagsdetail.platform
+    Workload: optionalInfo.tagsdetail.workload
+    Architect: optionalInfo.tagsdetail.architect
+    Owner: optionalInfo.tagsdetail.owner
+    Support: optionalInfo.tagsdetail.support
   }
-  properties:{
-    hostingEnvironmentProfile:{
-      id:aseId
+  properties: {
+    hostingEnvironmentProfile: {
+      id: aseId
     }
   }
-  sku:{
-    name:aspSKU
-    capacity:aspCapacity
+  sku: {
+    name: aspSKU
+    capacity: aspCapacity
   }
 }
