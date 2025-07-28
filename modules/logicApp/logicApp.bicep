@@ -7,6 +7,9 @@ param location string
 @description('Resource ID of the existing App Service Plan')
 param appServicePlanId string
 
+@description('Storage account connection string for Logic App Standard')
+param storageAccountConnectionString string
+
 @description('Storage account name for Logic App Standard')
 param storageAccountName string
 
@@ -25,34 +28,6 @@ output logicAppId string = logicAppStandard.id
 @description('Logic App Standard name')
 output logicAppName string = logicAppStandard.name
 
-@description('Storage Account resource ID')
-output storageAccountId string = storageAccount.id
-
-@description('Storage Account name')
-output storageAccountName string = storageAccount.name
-
-resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
-  name: storageAccountName
-  location: location
-  tags: {
-    Platform: optionalInfo.tagsdetail.platform
-    Workload: optionalInfo.tagsdetail.workload
-    Architect: optionalInfo.tagsdetail.architect
-    Owner: optionalInfo.tagsdetail.owner
-    Support: optionalInfo.tagsdetail.support
-  }
-  sku: {
-    name: 'Standard_LRS'
-  }
-  kind: 'StorageV2'
-  properties: {
-    accessTier: 'Hot'
-    allowBlobPublicAccess: false
-    allowSharedKeyAccess: true
-    minimumTlsVersion: 'TLS1_2'
-    supportsHttpsTrafficOnly: true
-  }
-}
 
 resource logicAppStandard 'Microsoft.Web/sites@2024-04-01' = {
   name: logicAppName
@@ -75,11 +50,11 @@ resource logicAppStandard 'Microsoft.Web/sites@2024-04-01' = {
       appSettings: union([
         {
           name: 'AzureWebJobsStorage'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};EndpointSuffix=core.windows.net'
+          value: storageAccountConnectionString
         }
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};EndpointSuffix=core.windows.net'
+          value: storageAccountConnectionString
         }
         {
           name: 'WEBSITE_CONTENTSHARE'
