@@ -26,7 +26,7 @@ param aspName string
 param aspSKU string
 param aspCapacity int
 
-module RG '../../modules/rg/rg.bicep' = {
+module RG '../modules/rg/rg.bicep' = {
   name:'deploy-resourceGroup'
   params:{
     resourceGroupName:resourceGroupName
@@ -35,7 +35,7 @@ module RG '../../modules/rg/rg.bicep' = {
   }
 }
 
-module NSG '../../modules/nsg/nsg.bicep' = {
+module NSG '../modules/nsg/nsg.bicep' = {
   name:'deploy-NSG'
   scope:resourceGroup(resourceGroupName)
   params: {
@@ -47,7 +47,7 @@ module NSG '../../modules/nsg/nsg.bicep' = {
   dependsOn:[RG]
 }
 
-module VNET '../../modules/vnet/vnet.bicep' = {
+module VNET '../modules/vnet/vnet.bicep' = {
   name:'deploy-VNET'
   scope:resourceGroup(resourceGroupName)
   params:{
@@ -77,7 +77,7 @@ module ASE 'br/public:avm/res/web/hosting-environment:0.4.0' = {
   }
 }
 
-module ASP '../../modules/asp/asp.bicep' = {
+module ASP '../modules/asp/asp.bicep' = {
   name:'AppS-ervice-Plan-Deployment'
   scope:resourceGroup(resourceGroupName)
   params:{
