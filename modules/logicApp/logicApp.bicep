@@ -19,6 +19,12 @@ param optionalInfo object
 @description('Logic App Standard configuration settings')
 param appSettings object = {}
 
+@description('Subnet ID for private endpoints')
+param subnetId string
+
+@description('Private DNS zone resource ID for blob storage')
+param privateDnsZoneId string = ''
+
 @description('Logic App Standard resource ID')
 output logicAppId string = logicAppStandard.id
 
@@ -51,6 +57,138 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
     allowSharedKeyAccess: true
     minimumTlsVersion: 'TLS1_2'
     supportsHttpsTrafficOnly: true
+    networkAcls: {
+      bypass: 'AzureServices'
+      defaultAction: 'Deny'
+    }
+    publicNetworkAccess: 'Disabled'
+  }
+}
+
+resource privateEndpointBlob 'Microsoft.Network/privateEndpoints@2023-11-01' = {
+  name: '${storageAccountName}-blob-pe'
+  location: location
+  tags: {
+    Platform: optionalInfo.tagsdetail.platform
+    Workload: optionalInfo.tagsdetail.workload
+    Architect: optionalInfo.tagsdetail.architect
+    Owner: optionalInfo.tagsdetail.owner
+    Support: optionalInfo.tagsdetail.support
+  }
+  properties: {
+    subnet: {
+      id: subnetId
+    }
+    privateLinkServiceConnections: [
+      {
+        name: '${storageAccountName}-blob-connection'
+        properties: {
+          privateLinkServiceId: storageAccount.id
+          groupIds: [
+            'blob'
+          ]
+        }
+      }
+    ]
+  }
+}
+
+resource privateEndpointFile 'Microsoft.Network/privateEndpoints@2023-11-01' = {
+  name: '${storageAccountName}-file-pe'
+  location: location
+  tags: {
+    Platform: optionalInfo.tagsdetail.platform
+    Workload: optionalInfo.tagsdetail.workload
+    Architect: optionalInfo.tagsdetail.architect
+    Owner: optionalInfo.tagsdetail.owner
+    Support: optionalInfo.tagsdetail.support
+  }
+  properties: {
+    subnet: {
+      id: subnetId
+    }
+    privateLinkServiceConnections: [
+      {
+        name: '${storageAccountName}-file-connection'
+        properties: {
+          privateLinkServiceId: storageAccount.id
+          groupIds: [
+            'file'
+          ]
+        }
+      }
+    ]
+  }
+}
+
+resource privateEndpointTable 'Microsoft.Network/privateEndpoints@2023-11-01' = {
+  name: '${storageAccountName}-table-pe'
+  location: location
+  tags: {
+    Platform: optionalInfo.tagsdetail.platform
+    Workload: optionalInfo.tagsdetail.workload
+    Architect: optionalInfo.tagsdetail.architect
+    Owner: optionalInfo.tagsdetail.owner
+    Support: optionalInfo.tagsdetail.support
+  }
+  properties: {
+    subnet: {
+      id: subnetId
+    }
+    privateLinkServiceConnections: [
+      {
+        name: '${storageAccountName}-table-connection'
+        properties: {
+          privateLinkServiceId: storageAccount.id
+          groupIds: [
+            'table'
+          ]
+        }
+      }
+    ]
+  }
+}
+
+resource privateEndpointQueue 'Microsoft.Network/privateEndpoints@2023-11-01' = {
+  name: '${storageAccountName}-queue-pe'
+  location: location
+  tags: {
+    Platform: optionalInfo.tagsdetail.platform
+    Workload: optionalInfo.tagsdetail.workload
+    Architect: optionalInfo.tagsdetail.architect
+    Owner: optionalInfo.tagsdetail.owner
+    Support: optionalInfo.tagsdetail.support
+  }
+  properties: {
+    subnet: {
+      id: subnetId
+    }
+    privateLinkServiceConnections: [
+      {
+        name: '${storageAccountName}-queue-connection'
+        properties: {
+          privateLinkServiceId: storageAccount.id
+          groupIds: [
+            'queue'
+          ]
+        }
+      }
+    ]
+  }
+}
+
+resource privateDnsZoneGroupBlob 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-11-01' = if (!empty(privateDnsZoneId)) {
+  parent: privateEndpointBlob
+  name: 'default'
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'privatelink-blob-core-windows-net'
+        properties: {
+          privateDnsZoneId: privateDnsZoneId
+        }
+      }
+    ]
   }
 }
 
@@ -80,6 +218,14 @@ resource logicAppStandard 'Microsoft.Web/sites@2024-04-01' = {
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
           value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};EndpointSuffix=core.windows.net'
+        }
+        {
+          name: 'WEBSITE_VNET_ROUTE_ALL'
+          value: '1'
+        }
+        {
+          name: 'WEBSITE_DNS_SERVER'
+          value: '168.63.129.16'
         }
         {
           name: 'WEBSITE_CONTENTSHARE'

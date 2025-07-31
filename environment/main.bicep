@@ -26,6 +26,11 @@ param aspName string
 param aspSKU string
 param aspCapacity int
 
+@description('Define Logic App Parameter Values')
+param logicAppName string
+param storageAccountName string
+param appInsightsConnectionString string = ''
+
 module RG '../modules/rg/rg.bicep' = {
   name:'deploy-resourceGroup'
   params:{
@@ -88,4 +93,66 @@ module ASP '../modules/asp/asp.bicep' = {
     aspSKU:aspSKU
     aspCapacity:aspCapacity
   }
+}
+
+// Deploy private DNS zones for storage account private endpoints
+module privateDnsZoneBlob '../modules/privateDnsZone/privateDnsZone.bicep' = {
+  name: 'deploy-privateDnsZone-blob'
+  scope: resourceGroup(resourceGroupName)
+  params: {
+    privateDnsZoneName: 'privatelink.blob.core.windows.net'
+    virtualNetworkId: VNET.outputs.vnetId
+    optionalInfo: optionalInfo
+  }
+  dependsOn: [RG, VNET]
+}
+
+module privateDnsZoneFile '../modules/privateDnsZone/privateDnsZone.bicep' = {
+  name: 'deploy-privateDnsZone-file'
+  scope: resourceGroup(resourceGroupName)
+  params: {
+    privateDnsZoneName: 'privatelink.file.core.windows.net'
+    virtualNetworkId: VNET.outputs.vnetId
+    optionalInfo: optionalInfo
+  }
+  dependsOn: [RG, VNET]
+}
+
+module privateDnsZoneTable '../modules/privateDnsZone/privateDnsZone.bicep' = {
+  name: 'deploy-privateDnsZone-table'
+  scope: resourceGroup(resourceGroupName)
+  params: {
+    privateDnsZoneName: 'privatelink.table.core.windows.net'
+    virtualNetworkId: VNET.outputs.vnetId
+    optionalInfo: optionalInfo
+  }
+  dependsOn: [RG, VNET]
+}
+
+module privateDnsZoneQueue '../modules/privateDnsZone/privateDnsZone.bicep' = {
+  name: 'deploy-privateDnsZone-queue'
+  scope: resourceGroup(resourceGroupName)
+  params: {
+    privateDnsZoneName: 'privatelink.queue.core.windows.net'
+    virtualNetworkId: VNET.outputs.vnetId
+    optionalInfo: optionalInfo
+  }
+  dependsOn: [RG, VNET]
+}
+
+// Deploy Logic App with private endpoints
+module LogicApp '../modules/logicApp/logicApp.bicep' = {
+  name: 'deploy-logicApp'
+  scope: resourceGroup(resourceGroupName)
+  params: {
+    logicAppName: logicAppName
+    location: location
+    appServicePlanId: ASP.outputs.aspId
+    storageAccountName: storageAccountName
+    appInsightsConnectionString: appInsightsConnectionString
+    optionalInfo: optionalInfo
+    subnetId: VNET.outputs.peSubnetId
+    privateDnsZoneId: privateDnsZoneBlob.outputs.privateDnsZoneId
+  }
+  dependsOn: [ASP, privateDnsZoneBlob, privateDnsZoneFile, privateDnsZoneTable, privateDnsZoneQueue]
 }

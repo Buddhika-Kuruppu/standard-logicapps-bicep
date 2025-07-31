@@ -8,8 +8,14 @@
         "location": {
             "value": "australiaeast"
         },
-        "nsgName":{
-            "value": "contoso-nsg-aue-0"
+        "nsgpeName":{
+            "value": "contoso-nsg-pe-aue-0"
+        },
+        "nsgaseName":{
+            "value": "contoso-nsg-ase-aue-0"
+        },
+        "aseName":{
+            "value": "contoso-ase-aue-0"
         },
         "virtualnetworkName":{
             "value": "contoso-vnet-aue-0"
@@ -41,10 +47,19 @@
         "aspCapacity": {
             "value": 2
         },
-        "optionalInfor":{
+        "logicAppName": {
+            "value": "contoso-logic-aue-0"
+        },
+        "storageAccountName": {
+            "value": "contosostgaue0"
+        },
+        "appInsightsConnectionString": {
+            "value": ""
+        },
+        "optionalInfo":{
             "value": {
                 "tagsdetail": {
-                    "plaform":"moreen",
+                    "platform":"moreen",
                     "workload":"Development",
                     "architect":"Sandman",
                     "owner":"IT",

@@ -76,3 +76,5 @@ resource subnet02 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' = {
 }
 
 output aseSubnetId string = subnet02.id
+output peSubnetId string = subnet01.id
+output vnetId string = VNET.id
