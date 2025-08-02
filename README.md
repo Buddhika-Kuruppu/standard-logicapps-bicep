@@ -20,11 +20,14 @@ Logic Apps store their workflow artifacts—definitions, runtime state, and meta
 If any endpoint is missing or misconfigured, workflow execution may fail due to access issues.
 
 🧩 Required Private Endpoints
-Service	Purpose
-Blob	Stores workflow definitions, artifacts, and metadata
-File	Mounts shared files required during execution
-Queue	Handles internal messaging and trigger management
-Table	Maintains workflow state and tracking data
+
+| Service | Purpose                                              |
+|---------|------------------------------------------------------|
+| Blob    | Stores workflow definitions, artifacts, and metadata |
+| File    | Mounts shared files required during execution        |
+| Queue   | Handles internal messaging and trigger management    |
+| Table   | Maintains workflow state and tracking data           |
+
 
 ⚠️ Important Configuration Notes
 All four private endpoints must be created within the same Virtual Network (VNet) that your Logic App is integrated with.
